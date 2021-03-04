@@ -204,9 +204,9 @@ function bootstrap-cella {
   write-host "Installing Cella to ${CELLA_HOME}"
 
   if( isWindows ) {
-    & $CELLA_NODE $CELLA_NPM install --force --no-save --no-lockfile https://aka.ms/cella.tgz  2>&1 >> $CELLA_HOME/log.txt
+    & $CELLA_NODE $CELLA_NPM install --force --no-save --scripts-prepend-node-path=true https://aka.ms/cella.tgz  2>&1 >> $CELLA_HOME/log.txt
   } else {
-    & $CELLA_NODE $CELLA_NPM install --force --no-save --no-lockfile  https://aka.ms/cella.tgz 2>&1 >> $CELLA_HOME/log.txt
+    & $CELLA_NODE $CELLA_NPM install --force --no-save --no-lockfile --scripts-prepend-node-path=true https://aka.ms/cella.tgz 2>&1 >> $CELLA_HOME/log.txt
   }
   if( $error.count -gt 0 ) {
     $error |% { add-content -encoding UTF8 $CELLA_HOME/log.txt $_ }
