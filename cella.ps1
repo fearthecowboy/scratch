@@ -10,12 +10,12 @@ if( ($ENV:ARGZ) -and ($ENV:ARGZ.length -gt 1)  ) {
   $Q=$ENV:ARGZ -replace "^(.*?),.*", '$1'
   if( $ENV:ARGZ.length -gt $q.length) {
     $tmp=(($ENV:ARGZ.substring($q.length+1) -replace '"', '`"' ) -replace $Q,'"')
-    $argz=invoke-expression "@($tmp)" # turn it into an array
+    $argz=[System.Collections.ArrayList](invoke-expression "@($tmp)") # turn it into an array
   } else {
-    $argz = @()
+    $argz = [System.Collections.ArrayList]@()
   }
 } else {
-  $argz=$args
+  $argz=[System.Collections.ArrayList]$args
 }
 
 # wrapper script for cella.
@@ -68,6 +68,9 @@ $reset = $argz -and $argz.IndexOf('--reset-cella') -gt -1
 $remove = $argz -and $argz.IndexOf('--remove-cella') -gt -1 
 
 if( $reset -or -$remove ) {
+  $argz.remove('--reset-cella');
+  $argz.remove('--remove-cella');
+
   if( $reset ) {
     write-host "Resetting Cella"
   }
