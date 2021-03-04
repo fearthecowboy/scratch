@@ -301,6 +301,7 @@ if "%1" EQU "--reset-cella" goto BOOTSTRAP
 :: if we're being asked to remove the install, call bootstrap
 if "%1" EQU "--remove-cella" ( 
   set REMOVE_CELLA=TRUE
+  doskey cella=
   goto BOOTSTRAP
 )
 
@@ -365,15 +366,12 @@ for %%i in (pwsh.exe powershell.exe) do (
 )
 :gotpwsh
 
-%POWERSHELL_EXE% -noprofile -executionpolicy unrestricted -command "iex (get-content %~dfp0 -raw)#"
+%POWERSHELL_EXE% -noprofile -executionpolicy unrestricted -command "iex (get-content %~dfp0 -raw)#" &&  set REMOVE_CELLA=
 :: endlocal 
 set CELLA_EXITCODE=%ERRORLEVEL%
 
-:: if we're being asked to reset the install, call bootstrap
+:: if we're being asked to remove it,we're done.
 if "%REMOVE_CELLA%" EQU "TRUE" ( 
-  :: remove any aliases
-  set REMOVE_CELLA=
-  doskey cella=
   goto :fin
 )
 
