@@ -357,7 +357,7 @@ for %%i in (pwsh.exe powershell.exe) do (
 )
 :gotpwsh
 
-%POWERSHELL_EXE% -noprofile -executionpolicy unrestricted "iex (get-content %~dfp0 -raw)#"
+%POWERSHELL_EXE% -noprofile -executionpolicy unrestricted -command "iex (get-content %~dfp0 -raw)#"
 :: endlocal 
 set CELLA_EXITCODE=%ERRORLEVEL%
 
