@@ -211,13 +211,13 @@ cella_bootstrap_node() {
     
   # UNPACK IT
   if [ "${CELLA_OS}" = "aix" ]; then
-    gunzip "${NODE_ARCHIVE}" | tar -xvC "${CELLA_HOME}/cache" "${NODE_FULLNAME}/bin/${NODE_EXE}" > /dev/null 2>&1
+    gunzip "${NODE_ARCHIVE}" | tar -xvC "${CELLA_HOME}/cache" "${NODE_FULLNAME}/bin/${NODE_EXE}" >> $CELLA_HOME/log.txt 2>&1
   else
-    tar $TAR_FLAGS "${NODE_ARCHIVE}" -C "${CELLA_HOME}/cache"  > /dev/null 2>&1
+    tar $TAR_FLAGS "${NODE_ARCHIVE}" -C "${CELLA_HOME}/cache" >> $CELLA_HOME/log.txt 2>&1
   fi
-  mv "${CELLA_HOME}/cache/${NODE_FULLNAME}/bin" "${CELLA_HOME}/cache/" > /dev/null 2>& 1
-  mv "${CELLA_HOME}/cache/${NODE_FULLNAME}/lib" "${CELLA_HOME}/cache/" > /dev/null 2>& 1
-  rm -r "${CELLA_HOME}/cache/${NODE_FULLNAME}" > /dev/null 2>& 1
+  mv "${CELLA_HOME}/cache/${NODE_FULLNAME}/bin" "${CELLA_HOME}/cache/" >> $CELLA_HOME/log.txt 2>&1
+  mv "${CELLA_HOME}/cache/${NODE_FULLNAME}/lib" "${CELLA_HOME}/cache/" >> $CELLA_HOME/log.txt 2>&1
+  rm -r "${CELLA_HOME}/cache/${NODE_FULLNAME}" >> $CELLA_HOME/log.txt 2>&1
 
   # OK, we good?
   CELLA_NODE=${CELLA_HOME}/cache/bin/node
