@@ -248,7 +248,7 @@ $shh = New-Module -name cella -ArgumentList @($CELLA_NODE,$CELLA_MODULE,$CELLA_H
   }
 
   function cella() { 
-    if( ($args.indexOf('--reset-cella') -gt -1) -or ($args.indexOf('--reset-cella') -gt -1)) {
+    if( ($args.indexOf('--remove-cella') -gt -1) -or ($args.indexOf('--reset-cella') -gt -1)) {
       # we really want to do call the ps1 script to do this.
       if( test-path "${CELLA_HOME}/cella.ps1" ) {
         & "${CELLA_HOME}/cella.ps1" @args
