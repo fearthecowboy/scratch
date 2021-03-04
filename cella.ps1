@@ -51,8 +51,7 @@ function cella-debug() {
   }
   else {
     $t = [int32]((get-date).Subtract(($CELLA_START_TIME)).ticks/10000)
-    write-output "[$t msec] " -nonewline >> $CELLA_HOME/log.txt
-    write-output $args >> $CELLA_HOME/log.txt
+    write-output "[$t msec] $args" >> $CELLA_HOME/log.txt
   }
 }
 
