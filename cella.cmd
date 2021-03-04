@@ -49,6 +49,11 @@ function cella-debug() {
     write-host -fore green "[$t msec] " -nonewline
     write-host -fore gray $args
   }
+  else {
+    $t = [int32]((get-date).Subtract(($CELLA_START_TIME)).ticks/10000)
+    write-output "[$t msec] " -nonewline >> $CELLA_HOME/log.txt
+    write-output $args >> $CELLA_HOME/log.txt
+  }
 }
 
 # set the home path. 
@@ -190,11 +195,13 @@ function bootstrap-cella {
   # ensure we have a node_modules here, so npm won't search for one up the tree.
   $shh = new-item -type directory -ea 0 $CELLA_HOME/node_modules
   pushd $CELLA_HOME
+  
+  $shh = & $CELLA_NODE $CELLA_NPM cache clear --force 2>&1 
 
   if( isWindows ) {
-    & $CELLA_NODE $CELLA_NPM install --force --no-save --no-lockfile https://aka.ms/cella.tgz  2>&1 > $CELLA_HOME/log.txt
+    & $CELLA_NODE $CELLA_NPM install --force --no-save --no-lockfile https://aka.ms/cella.tgz  2>&1 >> $CELLA_HOME/log.txt
   } else {
-    & $CELLA_NODE $CELLA_NPM install --force --no-save --no-lockfile  https://aka.ms/cella.tgz 2>&1 > $CELLA_HOME/log.txt
+    & $CELLA_NODE $CELLA_NPM install --force --no-save --no-lockfile  https://aka.ms/cella.tgz 2>&1 >> $CELLA_HOME/log.txt
   }
 
   # we should also copy the .bin files into the $CELLA_HOME folder to make reactivation (without being on the PATH) easy

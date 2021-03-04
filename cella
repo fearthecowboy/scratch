@@ -56,6 +56,14 @@ cella_debug() {
     else
       echo "[$OFFSET msec] $*"
     fi  
+  else 
+    local NOW=$(($(date +%s%N)/1000000))
+    local OFFSET=$(( $NOW - $CELLA_START_TIME ))
+    if [ -n "$CELLA_NESTED" ]; then
+      echo "[NESTED $OFFSET msec] $*" >> $CELLA_HOME/log.txt
+    else
+      echo "[$OFFSET msec] $*" >> $CELLA_HOME/log.txt
+    fi      
   fi 
 }
 
@@ -248,6 +256,8 @@ cella_bootstrap_cella() {
   command mkdir -p $CELLA_HOME/node_modules
 
   cd $CELLA_HOME
+  & $CELLA_NODE $CELLA_NPM cache clear --force 2>&1 > /dev/null
+
   $CELLA_NODE $CELLA_NPM --force install --no-save --no-lockfile https://aka.ms/cella.tgz  >> $CELLA_HOME/log.txt 2>&1
 
   cp $CELLA_HOME/node_modules/.bin/* .
