@@ -351,7 +351,13 @@ if "%1" NEQ "" (
   goto :LOOP
 )
 
-powershell -noprofile -executionpolicy unrestricted "iex (get-content %~dfp0 -raw)#"
+set POWERSHELL_EXE=
+for %%i in (pwsh.exe powershell.exe) do (
+  if EXIST "%%~$PATH:i" set POWERSHELL_EXE=%%~$PATH:i & goto :gotpwsh
+)
+:gotpwsh
+
+%POWERSHELL_EXE% -noprofile -executionpolicy unrestricted "iex (get-content %~dfp0 -raw)#"
 :: endlocal 
 set CELLA_EXITCODE=%ERRORLEVEL%
 
