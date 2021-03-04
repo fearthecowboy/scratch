@@ -48,23 +48,22 @@ CELLA_NODE=${CELLA_HOME}/cache/bin/node
 CELLA_NPM=${CELLA_HOME}/cache/bin/npm
 
 cella_debug() {
+  local NOW=$(($(date +%s%N)/1000000))
+  local OFFSET=$(( $NOW - $CELLA_START_TIME ))
+
   if [ ! -z "$CELLA_DEBUG" ]; then
-    local NOW=$(($(date +%s%N)/1000000))
-    local OFFSET=$(( $NOW - $CELLA_START_TIME ))
     if [ -n "$CELLA_NESTED" ]; then
       echo "[NESTED $OFFSET msec] $*"
     else
       echo "[$OFFSET msec] $*"
     fi  
-  else 
-    local NOW=$(($(date +%s%N)/1000000))
-    local OFFSET=$(( $NOW - $CELLA_START_TIME ))
-    if [ -n "$CELLA_NESTED" ]; then
-      echo "[NESTED $OFFSET msec] $*" >> $CELLA_HOME/log.txt
-    else
-      echo "[$OFFSET msec] $*" >> $CELLA_HOME/log.txt
-    fi      
-  fi 
+  fi
+
+  if [ -n "$CELLA_NESTED" ]; then
+    echo "[NESTED $OFFSET msec] $*" >> $CELLA_HOME/log.txt
+  else
+    echo "[$OFFSET msec] $*" >> $CELLA_HOME/log.txt
+  fi      
 }
 
 if [ "${1}" = "--reset-cella" ]; then

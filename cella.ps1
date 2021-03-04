@@ -1,6 +1,7 @@
 @(echo off) > $null 
 if #ftw NEQ '' goto :CMDSTART
 ($true){}
+$Error.clear();
 
 # powershell script starts here 
 
@@ -44,15 +45,13 @@ if( $argz.indexOf('--debug') -gt -1 ) {
 }
 
 function cella-debug() {
+  $t = [int32]((get-date).Subtract(($CELLA_START_TIME)).ticks/10000)
   if($SCRIPT:DEBUG) { 
-    $t = [int32]((get-date).Subtract(($CELLA_START_TIME)).ticks/10000)
     write-host -fore green "[$t msec] " -nonewline
     write-host -fore gray $args
   }
-  else {
-    $t = [int32]((get-date).Subtract(($CELLA_START_TIME)).ticks/10000)
-    write-output "[$t msec] $args" >> $CELLA_HOME/log.txt
-  }
+  
+  write-output "[$t msec] $args" >> $CELLA_HOME/log.txt
 }
 
 # set the home path. 
@@ -202,6 +201,11 @@ function bootstrap-cella {
   } else {
     & $CELLA_NODE $CELLA_NPM install --force --no-save --no-lockfile  https://aka.ms/cella.tgz 2>&1 >> $CELLA_HOME/log.txt
   }
+  if( $error.count -gt 0 ) {
+    add-content -encoding UTF8 $CELLA_HOME/log.txt $Error 
+    $Error.clear()
+  }
+
 
   # we should also copy the .bin files into the $CELLA_HOME folder to make reactivation (without being on the PATH) easy
   copy-item ./node_modules/.bin/cella.* 
