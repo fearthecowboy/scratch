@@ -106,17 +106,18 @@ function isWindows {
 }
 
 function bootstrap-node {
+  # if we have a custom cella node let's use that first
+  if( (verify-node (resolve "${CELLA_HOME}/cache/bin/node"))) {
+    cella-debug "Node: ${CELLA_NODE}"
+    return $TRUE;
+  }
+
   # check the node on the path.
   if( (verify-node ((get-command node -ea 0).source ))) {
     cella-debug "Node: ${CELLA_NODE}"
     return $TRUE;
   }
 
-  if( (verify-node (resolve "${CELLA_HOME}/cache/bin/node"))) {
-    cella-debug "Node: ${CELLA_NODE}"
-    return $TRUE;
-  }
-  
   # not there, or not good enough
 
   if( isWindows ) { 
@@ -300,7 +301,7 @@ SET /A CELLA_POSTSCRIPT=%RANDOM% * 32768 + %RANDOM%
 SET CELLA_POSTSCRIPT=%CELLA_HOME%\CELLA_tmp_%CELLA_POSTSCRIPT%.cmd
 
 :: find the right node
-if exist %CELLA_HOME%\bin\node.exe set CELLA_NODE=%CELLA_HOME%\bin\node.exe
+if exist %CELLA_HOME%\cache\bin\node.exe set CELLA_NODE=%CELLA_HOME%\cache\bin\node.exe
 if "%CELLA_NODE%" EQU "" ( 
   for %%i in (node.exe) do set CELLA_NODE=%%~$PATH:i      
 )

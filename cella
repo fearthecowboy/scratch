@@ -91,7 +91,7 @@ if [ "${1}" = "--remove-cella" ]; then
   fi
 
   shift
-  exit
+  return
 fi
 
 if [ "${1}" = "--debug" ]; then
