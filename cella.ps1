@@ -35,6 +35,7 @@ function resolve {
     param ( [string] $name )
     $name = Resolve-Path $name -ErrorAction 0 -ErrorVariable _err
     if (-not($name)) { return $_err[0].TargetObject }
+    $Error.clear()
     return $name
 }
 
@@ -71,13 +72,15 @@ if( $reset -or -$remove ) {
     cella-debug "Resetting Cella"
   }
 
+
   remove-item -recurse -force -ea 0 "${CELLA_HOME}/node_modules"
   remove-item -recurse -force -ea 0 "${CELLA_HOME}/bin"
   remove-item -recurse -force -ea 0 "${CELLA_HOME}/lib"
   remove-item -force -ea 0 "${CELLA_HOME}/cella.ps1"
   remove-item -force -ea 0 "${CELLA_HOME}/cella.cmd"
   remove-item -force -ea 0 "${CELLA_HOME}/cella"  
-  
+  $error.clear();
+
   if( $remove ) { 
     cella-debug "Removing Cella"
     exit
@@ -98,9 +101,11 @@ function verify-node() {
       } else {
         $SCRIPT:CELLA_NPM=resolve "${CELLA_NODE}\..\npm"
       }
+      $error.clear();
       return $TRUE;  
     }
   }
+  $error.clear();
   return $FALSE
 }
 
@@ -202,7 +207,7 @@ function bootstrap-cella {
     & $CELLA_NODE $CELLA_NPM install --force --no-save --no-lockfile  https://aka.ms/cella.tgz 2>&1 >> $CELLA_HOME/log.txt
   }
   if( $error.count -gt 0 ) {
-    add-content -encoding UTF8 $CELLA_HOME/log.txt $Error 
+    $error |% { add-content -encoding UTF8 $CELLA_HOME/log.txt $_ }
     $Error.clear()
   }
 
@@ -238,6 +243,7 @@ $shh = New-Module -name cella -ArgumentList @($CELLA_NODE,$CELLA_MODULE,$CELLA_H
       param ( [string] $name )
       $name = Resolve-Path $name -ErrorAction 0 -ErrorVariable _err
       if (-not($name)) { return $_err[0].TargetObject }
+      $Error.clear()
       return $name
   }
 
