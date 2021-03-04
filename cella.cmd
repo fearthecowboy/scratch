@@ -10,7 +10,7 @@ if( ($ENV:ARGZ) -and ($ENV:ARGZ.length -gt 1)  ) {
   $Q=$ENV:ARGZ -replace "^(.*?),.*", '$1'
   if( $ENV:ARGZ.length -gt $q.length) {
     $tmp=(($ENV:ARGZ.substring($q.length+1) -replace '"', '`"' ) -replace $Q,'"')
-    $argz=[System.Collections.ArrayList](invoke-expression "@($tmp)") # turn it into an array
+    $argz=[System.Collections.ArrayList]@(invoke-expression "@($tmp,'')") # turn it into an array
   } else {
     $argz = [System.Collections.ArrayList]@()
   }
