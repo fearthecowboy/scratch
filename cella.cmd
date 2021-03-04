@@ -341,6 +341,7 @@ if "%CELLA_NODE%" EQU "" goto OHNONONODE:
 :: call the program
 "%CELLA_NODE%" "%CELLA_HOME%\node_modules\cella" %* 
 set CELLA_EXITCODE=%ERRORLEVEL%
+doskey cella="%CELLA_HOME%\node_modules\.bin\cella.cmd" $*
 
 :POSTSCRIPT
 :: Call the post-invocation script if it is present, then delete it.
@@ -385,8 +386,6 @@ if "%REMOVE_CELLA%" EQU "TRUE" (
 )
 
 :CREATEALIAS
-:: doskey /m | findstr cella= 
-:: IF %ERRORLEVEL% NEQ 0 
 doskey cella="%CELLA_HOME%\node_modules\.bin\cella.cmd" $*
 
 :fin
