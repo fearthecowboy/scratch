@@ -92,19 +92,21 @@ if( $reset -or -$remove ) {
 function verify-node() {
   param( $NODE ) 
 
-  if( get-command -ea 0 $NODE ) {
-    if( (& $NODE -e "[major, minor, patch ] = process.versions.node.split('.'); console.log( major>14 || major == 14 & minor >= 15)") -gt 0 ) {
-      # good version of node
-      # set the variables 
+  if( $NODE ) {
+    if( get-command -ea 0 $NODE ) {
+      if( (& $NODE -e "[major, minor, patch ] = process.versions.node.split('.'); console.log( major>14 || major == 14 & minor >= 15)") -gt 0 ) {
+        # good version of node
+        # set the variables 
 
-      $SCRIPT:CELLA_NODE=$NODE
-      if( isWindows ) {
-        $SCRIPT:CELLA_NPM=resolve "${CELLA_NODE}\..\node_modules\npm"
-      } else {
-        $SCRIPT:CELLA_NPM=resolve "${CELLA_NODE}\..\npm"
+        $SCRIPT:CELLA_NODE=$NODE
+        if( isWindows ) {
+          $SCRIPT:CELLA_NPM=resolve "${CELLA_NODE}\..\node_modules\npm"
+        } else {
+          $SCRIPT:CELLA_NPM=resolve "${CELLA_NODE}\..\npm"
+        }
+        $error.clear();
+        return $TRUE;  
       }
-      $error.clear();
-      return $TRUE;  
     }
   }
   $error.clear();
