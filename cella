@@ -90,6 +90,14 @@ if [ "${1}" = "--remove-cella" ]; then
     rm -rf $CELLA_HOME/cache/lib
   fi
 
+  if [ -f $CELLA_HOME/cella.ps1 ]; then 
+    rm -f $CELLA_HOME/cella.ps1
+  fi
+
+  if [ -f $CELLA_HOME/cella ]; then 
+    rm -f $CELLA_HOME/cella
+  fi
+
   shift
   return
 fi
@@ -315,6 +323,15 @@ cella() {
     if [ -d $CELLA_HOME/cache/lib ]; then 
       rm -rf $CELLA_HOME/cache/lib
     fi
+
+    if [ -f $CELLA_HOME/cella.ps1 ]; then 
+      rm -f $CELLA_HOME/cella.ps1
+    fi
+
+    if [ -f $CELLA_HOME/cella ]; then 
+      rm -f $CELLA_HOME/cella
+    fi
+
     unset cella
     return 0
   fi

@@ -71,6 +71,9 @@ if( $reset -or -$remove ) {
   remove-item -recurse -force -ea 0 "${CELLA_HOME}/node_modules"
   remove-item -recurse -force -ea 0 "${CELLA_HOME}/bin"
   remove-item -recurse -force -ea 0 "${CELLA_HOME}/lib"
+  remove-item -force -ea 0 "${CELLA_HOME}/cella.ps1"
+  remove-item -force -ea 0 "${CELLA_HOME}/cella.cmd"
+  remove-item -force -ea 0 "${CELLA_HOME}/cella"  
   
   if( $remove ) { 
     cella-debug "Removing Cella"
