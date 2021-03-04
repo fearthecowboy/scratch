@@ -188,9 +188,9 @@ function bootstrap-cella {
   pushd $CELLA_HOME
 
   if( isWindows ) {
-    $shh = & $CELLA_NODE $CELLA_NPM install --force --no-save --no-lockfile c:\tmp\cella-0.0.1.tgz  2>&1
+    $shh = & $CELLA_NODE $CELLA_NPM install --force --no-save --no-lockfile https://aka.ms/cella.tgz  2>&1
   } else {
-    $shh = & $CELLA_NODE $CELLA_NPM install --force --no-save --no-lockfile  /mnt/c/tmp/cella-0.0.1.tgz 2>&1
+    $shh = & $CELLA_NODE $CELLA_NPM install --force --no-save --no-lockfile  https://aka.ms/cella.tgz 2>&1
   }
 
   popd
