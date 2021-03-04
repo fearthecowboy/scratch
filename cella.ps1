@@ -283,7 +283,7 @@ $shh = New-Module -name cella -ArgumentList @($CELLA_NODE,$CELLA_MODULE,$CELLA_H
     # dot-source the postscript file to modify the environment
     if ($env:CELLA_POSTSCRIPT -and (Test-Path $env:CELLA_POSTSCRIPT)) {
       # write-host (get-content -raw $env:CELLA_POSTSCRIPT)
-      . $env:CELLA_POSTSCRIPT
+      iex (get-content -raw $env:CELLA_POSTSCRIPT)
       Remove-Item -Force $env:CELLA_POSTSCRIPT
       remove-item -ea 0 -force env:CELLA_POSTSCRIPT
     }
