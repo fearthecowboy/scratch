@@ -255,7 +255,7 @@ cella_bootstrap_cella() {
   command mkdir -p $CELLA_HOME/node_modules
 
   cd $CELLA_HOME
-  & $CELLA_NODE $CELLA_NPM cache clear --force 2>&1 > /dev/null
+  $CELLA_NODE $CELLA_NPM cache clean --force 2>&1 > /dev/null
 
   $CELLA_NODE $CELLA_NPM --force install --no-save --no-lockfile https://aka.ms/cella.tgz  >> $CELLA_HOME/log.txt 2>&1
 

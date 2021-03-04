@@ -72,7 +72,6 @@ if( $reset -or -$remove ) {
     cella-debug "Resetting Cella"
   }
 
-
   remove-item -recurse -force -ea 0 "${CELLA_HOME}/node_modules"
   remove-item -recurse -force -ea 0 "${CELLA_HOME}/bin"
   remove-item -recurse -force -ea 0 "${CELLA_HOME}/lib"
@@ -199,7 +198,8 @@ function bootstrap-cella {
   $shh = new-item -type directory -ea 0 $CELLA_HOME/node_modules
   pushd $CELLA_HOME
   
-  $shh = & $CELLA_NODE $CELLA_NPM cache clear --force 2>&1 
+  $shh = & $CELLA_NODE $CELLA_NPM cache clean --force 2>&1 
+  $error.clear();
 
   if( isWindows ) {
     & $CELLA_NODE $CELLA_NPM install --force --no-save --no-lockfile https://aka.ms/cella.tgz  2>&1 >> $CELLA_HOME/log.txt
