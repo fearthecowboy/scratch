@@ -188,10 +188,13 @@ function bootstrap-cella {
   pushd $CELLA_HOME
 
   if( isWindows ) {
-    $shh = & $CELLA_NODE $CELLA_NPM install --force --no-save --no-lockfile https://aka.ms/cella.tgz  2>&1
+    & $CELLA_NODE $CELLA_NPM install --force --no-save --no-lockfile https://aka.ms/cella.tgz  2>&1 > $CELLA_HOME/log.txt
   } else {
-    $shh = & $CELLA_NODE $CELLA_NPM install --force --no-save --no-lockfile  https://aka.ms/cella.tgz 2>&1
+    & $CELLA_NODE $CELLA_NPM install --force --no-save --no-lockfile  https://aka.ms/cella.tgz 2>&1 > $CELLA_HOME/log.txt
   }
+
+  # we should also copy the .bin files into the $CELLA_HOME folder to make reactivation (without being on the PATH) easy
+  copy-item ./node_modules/.bin/cella.* 
 
   popd
 
@@ -225,12 +228,21 @@ $shh = New-Module -name cella -ArgumentList @($CELLA_NODE,$CELLA_MODULE,$CELLA_H
   }
 
   function cella() { 
+    if( ($args.indexOf('--reset-cella') -gt -1) -or ($args.indexOf('--reset-cella') -gt -1)) {
+      # we really want to do call the ps1 script to do this.
+      if( test-path "${CELLA_HOME}/cella.ps1" ) {
+        & "${CELLA_HOME}/cella.ps1" @args
+      }
+      return
+    }
+
     if( -not (test-path $CELLA_MODULE )) {
       write-error "Cella is not installed."
       write-host -nonewline "You can reinstall cella by running "
       write-host -fore green "iex (iwr -useb aka.ms/cella.ps1)"
       return
     }
+
     # setup the postscript file
     # Generate 31 bits of randomness, to avoid clashing with concurrent executions.
     $env:CELLA_POSTSCRIPT = resolve "${CELLA_HOME}/cella_tmp_${(Get-Random -SetSeed $PID)}.ps1"

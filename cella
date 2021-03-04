@@ -76,6 +76,24 @@ if [ "${1}" = "--reset-cella" ]; then
   shift
 fi
 
+if [ "${1}" = "--remove-cella" ]; then
+  if [ -d $CELLA_HOME/node_modules ]; then 
+    cella_debug removing cella package
+    rm -rf $CELLA_HOME/node_modules
+  fi
+
+  if [ -d $CELLA_HOME/cache/bin ]; then 
+    rm -rf $CELLA_HOME/cache/bin
+  fi 
+
+  if [ -d $CELLA_HOME/cache/lib ]; then 
+    rm -rf $CELLA_HOME/cache/lib
+  fi
+
+  shift
+  exit
+fi
+
 if [ "${1}" = "--debug" ]; then
   CELLA_DEBUG=TRUE
 fi
@@ -222,7 +240,9 @@ cella_bootstrap_cella() {
   command mkdir -p $CELLA_HOME/node_modules
 
   cd $CELLA_HOME
-  $CELLA_NODE $CELLA_NPM --force install --no-save --no-lockfile https://aka.ms/cella.tgz  > /dev/null 2>&1
+  $CELLA_NODE $CELLA_NPM --force install --no-save --no-lockfile https://aka.ms/cella.tgz  >> $CELLA_HOME/log.txt 2>&1
+
+  cp $CELLA_HOME/node_modules/.bin/* .
   
   # go back where we were
   cd $CELLA_PWD
@@ -265,6 +285,40 @@ fi
 cella_debug 'real cella adding function'
 
 cella() {
+  if [ "${1}" = "--reset-cella" ]; then
+    if [ -d $CELLA_HOME/node_modules ]; then 
+      cella_debug forcing reinstall of cella package
+      rm -rf $CELLA_HOME/node_modules
+    fi
+
+    if [ -d $CELLA_HOME/cache/bin ]; then 
+      rm -rf $CELLA_HOME/cache/bin
+    fi 
+
+    if [ -d $CELLA_HOME/cache/lib ]; then 
+      rm -rf $CELLA_HOME/cache/lib
+    fi
+
+    . $CELLA_HOME/cella $*
+  fi
+
+  if [ "${1}" = "--remove-cella" ]; then
+    if [ -d $CELLA_HOME/node_modules ]; then 
+      cella_debug removing cella package
+      rm -rf $CELLA_HOME/node_modules
+    fi
+
+    if [ -d $CELLA_HOME/cache/bin ]; then 
+      rm -rf $CELLA_HOME/cache/bin
+    fi 
+
+    if [ -d $CELLA_HOME/cache/lib ]; then 
+      rm -rf $CELLA_HOME/cache/lib
+    fi
+    unset cella
+    return 0
+  fi
+
   local cst=$CELLA_START_TIME
 
   CELLA_START_TIME=$(($(date +%s%N)/1000000))
