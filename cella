@@ -68,7 +68,7 @@ cella_debug() {
 
 if [ "${1}" = "--reset-cella" ]; then
   if [ -d $CELLA_HOME/node_modules ]; then 
-    cella_debug forcing reinstall of cella package
+    echo Forcing reinstall of Cella package
     rm -rf $CELLA_HOME/node_modules
   fi
 
@@ -85,7 +85,7 @@ fi
 
 if [ "${1}" = "--remove-cella" ]; then
   if [ -d $CELLA_HOME/node_modules ]; then 
-    cella_debug removing cella package
+    echo Removing Cella package
     rm -rf $CELLA_HOME/node_modules
   fi
 
@@ -253,6 +253,8 @@ cella_bootstrap_cella() {
 
   # ensure we have a node_modules here, so npm won't search for one up the tree.
   command mkdir -p $CELLA_HOME/node_modules
+  
+  echo Installing Cella in $CELLA_HOME
 
   cd $CELLA_HOME
   $CELLA_NODE $CELLA_NPM cache clean --force 2>&1 > /dev/null
@@ -304,7 +306,7 @@ cella_debug 'real cella adding function'
 cella() {
   if [ "${1}" = "--reset-cella" ]; then
     if [ -d $CELLA_HOME/node_modules ]; then 
-      cella_debug forcing reinstall of cella package
+      echo Forcing reinstall of Cella package
       rm -rf $CELLA_HOME/node_modules
     fi
 
@@ -321,7 +323,7 @@ cella() {
 
   if [ "${1}" = "--remove-cella" ]; then
     if [ -d $CELLA_HOME/node_modules ]; then 
-      cella_debug removing cella package
+      echo Removing Cella package
       rm -rf $CELLA_HOME/node_modules
     fi
 

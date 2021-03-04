@@ -69,7 +69,7 @@ $remove = $argz -and $argz.IndexOf('--remove-cella') -gt -1
 
 if( $reset -or -$remove ) {
   if( $reset ) {
-    cella-debug "Resetting Cella"
+    write-host "Resetting Cella"
   }
 
   remove-item -recurse -force -ea 0 "${CELLA_HOME}/node_modules"
@@ -81,7 +81,7 @@ if( $reset -or -$remove ) {
   $error.clear();
 
   if( $remove ) { 
-    cella-debug "Removing Cella"
+    write-host "Removing Cella"
     exit
   }
 }
@@ -200,6 +200,8 @@ function bootstrap-cella {
   
   $shh = & $CELLA_NODE $CELLA_NPM cache clean --force 2>&1 
   $error.clear();
+
+  write-host "Installing Cella to ${CELLA_HOME}"
 
   if( isWindows ) {
     & $CELLA_NODE $CELLA_NPM install --force --no-save --no-lockfile https://aka.ms/cella.tgz  2>&1 >> $CELLA_HOME/log.txt
