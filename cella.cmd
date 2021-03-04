@@ -162,7 +162,11 @@ function bootstrap-node {
 
   switch($NODE_OS){
     'win' { 
-      $shh= expand-archive -path $NODE_ARCHIVE -destinationpath "${CELLA_HOME}/cache" 
+      if( get-command -ea 0 tar.exe ) {
+        tar "-xvf" "${NODE_ARCHIVE}" -C "${CELLA_HOME}/cache"  2>&1  > $null
+      } else {
+        $shh= expand-archive -path $NODE_ARCHIVE -destinationpath "${CELLA_HOME}/cache" 
+      }
       move-item "${CELLA_HOME}/cache/${NODE_FULLNAME}" "${CELLA_HOME}/cache/bin" 
     }
     'aix' { 
