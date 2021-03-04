@@ -276,7 +276,7 @@ $shh = New-Module -name cella -ArgumentList @($CELLA_NODE,$CELLA_MODULE,$CELLA_H
 
     # setup the postscript file
     # Generate 31 bits of randomness, to avoid clashing with concurrent executions.
-    $env:CELLA_POSTSCRIPT = resolve "${CELLA_HOME}/cella_tmp_${(Get-Random -SetSeed $PID)}.ps1"
+    $env:CELLA_POSTSCRIPT = resolve "${CELLA_HOME}/cella_tmp_$(Get-Random -SetSeed $PID).ps1"
 
     & $CELLA_NODE $CELLA_MODULE @args  
 
