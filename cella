@@ -273,7 +273,7 @@ cella_bootstrap_cella() {
   $CELLA_NODE $CELLA_NPM cache clean --force >> $CELLA_HOME/log.txt 2>&1
   local OLD_PATH=$PATH
   PATH=`dirname $CELLA_NODE`:$PATH
-  $CELLA_NODE $CELLA_NPM --force install --no-save --no-lockfile --scripts-prepend-node-path=true https://aka.ms/cella.tgz  >> $CELLA_HOME/log.txt 2>&1
+  $CELLA_NODE $CELLA_NPM --force install --no-save --no-lockfile --scripts-prepend-node-path=true https://aka.ms/cella.tgz?$CELLA_START_TIME  >> $CELLA_HOME/log.txt 2>&1
 
   PATH=$OLD_PATH
 
