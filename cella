@@ -29,8 +29,8 @@ cella_init() {
   # find important cmdline args
   CELLA_ARGS=()
   for each in "$@"; do case $each in
-    --cella-reset) CELLA_RESET=TRUE;;
-    --cella-remove) CELLA_REMOVE=TRUE;;
+    --reset-cella) CELLA_RESET=TRUE;;
+    --remove-cella) CELLA_REMOVE=TRUE;;
     --debug) CELLA_DEBUG=TRUE && CELLA_ARGS+=("$each");;
     *) CELLA_ARGS+=("$each");;
   esac ;done
