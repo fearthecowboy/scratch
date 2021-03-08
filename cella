@@ -7,8 +7,24 @@ CELLA_NODE_LATEST=14.16.0
 CELLA_NODE_REMOTE=https://nodejs.org/dist/
 CELLA_PWD=`pwd`
 
-# echo CELLA INSTALLATION/RUN SCRIPT
-CELLA_START_TIME=$(($(date +%s%N)/1000000))
+cella_get_os() {
+  CELLA_OS="$(uname | sed 'y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/')"
+  CELLA_ARCH="$(uname -m | sed -e 's/x86_64/x64/;s/i86pc/x64/;s/i686/x86/;s/aarch64/arm64/')"
+
+  case $CELLA_OS in 
+    ( mingw64_nt* | msys_nt* ) CELLA_OS="win" ;;
+    ( darwin*|bsd) CELLA_IS_THIS_BSD=TRUE ;;
+    ( aix ) CELLA_ARCH="ppc64" ;;
+  esac
+}
+
+cella_get_os
+
+if [ ! -z "$CELLA_IS_THIS_BSD" ]; then
+  CELLA_START_TIME=$(date +%s)
+else 
+  CELLA_START_TIME=$(($(date +%s%N)/1000000))
+fi
 
 # check to see if we've been dot-sourced (should work for most POSIX shells)
 sourced=0
@@ -48,21 +64,26 @@ CELLA_NODE=${CELLA_HOME}/cache/bin/node
 CELLA_NPM=${CELLA_HOME}/cache/bin/npm
 
 cella_debug() {
-  local NOW=$(($(date +%s%N)/1000000))
-  local OFFSET=$(( $NOW - $CELLA_START_TIME ))
+  if [ ! -z "$CELLA_IS_THIS_BSD" ]; then
+    local NOW=$(date +%s)
+    local OFFSET="$(( $NOW - $CELLA_START_TIME )) sec"
+  else
+    local NOW=$(($(date +%s%N)/1000000))
+    local OFFSET="$(( $NOW - $CELLA_START_TIME )) msec"
+  fi
 
   if [ ! -z "$CELLA_DEBUG" ]; then
     if [ -n "$CELLA_NESTED" ]; then
-      echo "[NESTED $OFFSET msec] $*"
+      echo "[NESTED $OFFSET] $*"
     else
-      echo "[$OFFSET msec] $*"
+      echo "[$OFFSET] $*"
     fi  
   fi
 
   if [ -n "$CELLA_NESTED" ]; then
-    echo "[NESTED $OFFSET msec] $*" >> $CELLA_HOME/log.txt
+    echo "[NESTED $OFFSET] $*" >> $CELLA_HOME/log.txt
   else
-    echo "[$OFFSET msec] $*" >> $CELLA_HOME/log.txt
+    echo "[$OFFSET] $*" >> $CELLA_HOME/log.txt
   fi      
 }
 
@@ -122,6 +143,8 @@ cella_cleanup() {
   unset CELLA_NPM
   unset CELLA_NESTED
   unset CELLA_OS
+  unset CELLA_ARCH
+  unset CELLA_IS_THIS_BSD
   unset CELLA_DEBUG
   unset cella_bootstrap_node
   unset cella_bootstrap_cella
@@ -136,8 +159,9 @@ cella_cleanup() {
 cella_bootstrap_node() {
   cella_debug starting cella_bootstrap_node
 
+
   local NODE_EXE="node"
-  if [ "${NODE_OS}" = "win" ]; then
+  if [ "${CELLA_OS}" = "win" ]; then
     NODE_EXE="node.exe"
   fi
 
@@ -169,29 +193,15 @@ cella_bootstrap_node() {
   # we don't seem to have a suitable nodejs on the path
   # let's grab a well-known one, cache it and use it.
 
-  # Parse the OS name and architecture from `uname`.
-  local NODE_OS="$(uname | sed 'y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/')"
-
-  # When running inside Git bash on Windows, `uname` reports "MINGW64_NT".
-  case $NODE_OS in mingw64_nt* | msys_nt*)
-    NODE_OS="win"
-  esac
-
-  local NODE_ARCH="$(uname -m | sed -e 's/x86_64/x64/;s/i86pc/x64/;s/i686/x86/;s/aarch64/arm64/')"
-  # On AIX `uname -m` reports the machine ID number of the hardware running the system.
-  if [ "${NODE_OS}" = "aix" ]; then
-    NODE_ARCH="ppc64"
-  fi
-
-  local NODE_ARCHIVE_EXT=".tar.gz"
+  local CELLA_ARCHIVE_EXT=".tar.gz"
 	local TAR_FLAGS="-zxvf"
-	if [ "${NODE_OS}" = "win" ]; then
-	  NODE_ARCHIVE_EXT=".zip"
+	if [ "${CELLA_OS}" = "win" ]; then
+	  CELLA_ARCHIVE_EXT=".zip"
   fi
 
-  local NODE_FULLNAME="node-v${CELLA_NODE_LATEST}-${NODE_OS}-${NODE_ARCH}"
-  local NODE_URI="${CELLA_NODE_REMOTE}v${CELLA_NODE_LATEST}/${NODE_FULLNAME}${NODE_ARCHIVE_EXT}"
-  local NODE_ARCHIVE="${CELLA_HOME}/cache/${NODE_FULLNAME}${NODE_ARCHIVE_EXT}"
+  local NODE_FULLNAME="node-v${CELLA_NODE_LATEST}-${CELLA_OS}-${CELLA_ARCH}"
+  local NODE_URI="${CELLA_NODE_REMOTE}v${CELLA_NODE_LATEST}/${NODE_FULLNAME}${CELLA_ARCHIVE_EXT}"
+  local CELLA_ARCHIVE="${CELLA_HOME}/cache/${NODE_FULLNAME}${CELLA_ARCHIVE_EXT}"
   
   if [ ! -d "${CELLA_HOME}/cache" ]; then
     command mkdir -p "${CELLA_HOME}/cache"
@@ -199,21 +209,21 @@ cella_bootstrap_node() {
 
   echo "Downloading bootstrap node from ${NODE_URI}"
   if type noglob > /dev/null 2>&1; then
-    noglob curl -L -# "${NODE_URI}" -o "${NODE_ARCHIVE}"
+    noglob curl -L -# "${NODE_URI}" -o "${CELLA_ARCHIVE}"
   else
-    curl -L -# "${NODE_URI}" -o "${NODE_ARCHIVE}"
+    curl -L -# "${NODE_URI}" -o "${CELLA_ARCHIVE}"
   fi
 
-   if [ ! -f "${NODE_ARCHIVE}" ]; then
+   if [ ! -f "${CELLA_ARCHIVE}" ]; then
     echo "Failed to download node binary."
     return 1
   fi
     
   # UNPACK IT
   if [ "${CELLA_OS}" = "aix" ]; then
-    gunzip "${NODE_ARCHIVE}" | tar -xvC "${CELLA_HOME}/cache" "${NODE_FULLNAME}/bin/${NODE_EXE}" >> $CELLA_HOME/log.txt 2>&1
+    gunzip "${CELLA_ARCHIVE}" | tar -xvC "${CELLA_HOME}/cache" "${NODE_FULLNAME}/bin/${NODE_EXE}" >> $CELLA_HOME/log.txt 2>&1
   else
-    tar $TAR_FLAGS "${NODE_ARCHIVE}" -C "${CELLA_HOME}/cache" >> $CELLA_HOME/log.txt 2>&1
+    tar $TAR_FLAGS "${CELLA_ARCHIVE}" -C "${CELLA_HOME}/cache" >> $CELLA_HOME/log.txt 2>&1
   fi
   mv "${CELLA_HOME}/cache/${NODE_FULLNAME}/bin" "${CELLA_HOME}/cache/" >> $CELLA_HOME/log.txt 2>&1
   mv "${CELLA_HOME}/cache/${NODE_FULLNAME}/lib" "${CELLA_HOME}/cache/" >> $CELLA_HOME/log.txt 2>&1
@@ -347,9 +357,15 @@ cella() {
     return 0
   fi
 
+  cella_get_os
+
   local cst=$CELLA_START_TIME
 
-  CELLA_START_TIME=$(($(date +%s%N)/1000000))
+  if [ ! -z "$CELLA_IS_THIS_BSD" ]; then
+    CELLA_START_TIME=$(date +%s)
+  else 
+    CELLA_START_TIME=$(($(date +%s%N)/1000000))
+  fi
 
   if [ ! -f $CELLA_NODE ]; then
     echo The installation of nodejs $CELLA_NODE that cella is using is missing
