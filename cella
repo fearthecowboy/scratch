@@ -12,7 +12,7 @@ cella_init() {
   CELLA_ARCH="$(uname -m | sed -e 's/x86_64/x64/;s/i86pc/x64/;s/i686/x86/;s/aarch64/arm64/')"
 
   case $CELLA_OS in 
-    ( mingw64_nt* | msys_nt* ) CELLA_OS="win" ;;
+    ( mingw64_nt* | msys_nt* ) CELLA_OS="win";;
     ( darwin*|bsd) CELLA_IS_THIS_BSD=TRUE;;
     ( aix ) CELLA_ARCH="ppc64" ;;
   esac
@@ -24,14 +24,16 @@ cella_init() {
   fi
 
   # find important cmdline args
-  for each in $*; do case $each  in
+  CELLA_ARGS=()
+  for each in "$@"; do case $each  in
     --cella-reset) CELLA_RESET=TRUE;;
     --cella-remove) CELLA_REMOVE=TRUE;;
     --debug) CELLA_DEBUG=TRUE;;
+    *) CELLA_ARGS+=("$each");;
   esac ;done
 }
 
-cella_init
+cella_init "$@"
 
 # check to see if we've been dot-sourced (should work for most POSIX shells)
 sourced=0
@@ -151,6 +153,7 @@ cella_cleanup() {
   unset CELLA_REMOVE
   unset CELLA_RESET
   unset CELLA_START_TIME
+  unset CELLA_ARGS
   if [ -f "${CELLA_POSTSCRIPT}" ]; then
     command rm "${CELLA_POSTSCRIPT}"
   fi
@@ -309,7 +312,7 @@ fi
 if [ -z $CELLA_NESTED ]; then
   cella_debug executing final script: $CELLA_SCRIPT
   CELLA_NESTED=TRUE
-  . $CELLA_SCRIPT $* 
+  . $CELLA_SCRIPT $CELLA_ARGS
   return # let the real script take over from here. 
 fi
 
@@ -319,7 +322,7 @@ cella_debug 'real cella adding function'
 cella() {
   local cst=$CELLA_START_TIME
 
-  cella_init  
+  cella_init "$@"
 
   if [ ! -z "$CELLA_RESET" ]; then
     if [ -d $CELLA_HOME/node_modules ]; then 
@@ -335,7 +338,7 @@ cella() {
       rm -rf $CELLA_HOME/cache/lib
     fi
 
-    . $CELLA_HOME/cella $*
+    . $CELLA_HOME/cella "${CELLA_ARGS[@]}"
   fi
 
   if [ ! -z "$CELLA_REMOVE" ]; then
@@ -360,6 +363,7 @@ cella() {
       rm -f $CELLA_HOME/cella
     fi
 
+    unset CELLA_ARGS
     unset cella
     return 0
   fi
@@ -381,7 +385,7 @@ cella() {
 
   # call cella.js
   # it picks up the CELLA_POSTSCRIPT environment variable to know where to dump the postscript
-  $CELLA_NODE $CELLA_MAIN $*
+  $CELLA_NODE $CELLA_MAIN ${CELLA_ARGS[@]}
   
   cella_debug called cella.js
   # modify the environment 
@@ -398,8 +402,8 @@ cella() {
 }
 
 # did they dotsource and have args go ahead and run it then!
-if [ -n "$*" ]; then 
-  cella $*
+if [ -n "$CELLA_ARGS" ]; then 
+  cella "$@"
 fi
 
 cella_cleanup
