@@ -326,6 +326,7 @@ cella() {
 
   if [ ! -z "$CELLA_RESET" ]; then
     if [ -d $CELLA_HOME/node_modules ]; then 
+      unset CELLA_RESET
       echo Forcing reinstall of Cella package
       rm -rf $CELLA_HOME/node_modules
     fi
@@ -343,6 +344,7 @@ cella() {
 
   if [ ! -z "$CELLA_REMOVE" ]; then
     if [ -d $CELLA_HOME/node_modules ]; then 
+      unset CELLA_REMOVE
       echo Removing Cella package
       rm -rf $CELLA_HOME/node_modules
     fi
