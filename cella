@@ -326,7 +326,6 @@ cella() {
 
   if [ ! -z "$CELLA_RESET" ]; then
     if [ -d $CELLA_HOME/node_modules ]; then 
-      unset CELLA_RESET
       echo Forcing reinstall of Cella package
       rm -rf $CELLA_HOME/node_modules
     fi
@@ -338,7 +337,9 @@ cella() {
     if [ -d $CELLA_HOME/cache/lib ]; then 
       rm -rf $CELLA_HOME/cache/lib
     fi
-
+    
+    unset CELLA_RESET
+    echo "${CELLA_ARGS[@]}"
     . $CELLA_HOME/cella "${CELLA_ARGS[@]}"
   fi
 
