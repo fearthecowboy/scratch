@@ -155,7 +155,6 @@ cella_cleanup() {
   unset CELLA_DEBUG
   unset cella_bootstrap_node
   unset cella_bootstrap_cella
-  unset cella_cleanup
   unset CELLA_REMOVE
   unset CELLA_RESET
   unset CELLA_START_TIME
@@ -175,29 +174,33 @@ cella_bootstrap_node() {
   fi
 
   local N=`which $NODE_EXE`
-  
-  if [ ! -z $N ]; then
-    if [ `$N -e "[major, minor, patch ] = process.versions.node.split('.'); console.log( major>14 || major == 14 & minor >= 16)"` -gt 0 ]; then
-       CELLA_NODE=$N
-       CELLA_NPM=`which npm`
-       cella_debug using node in path
-       return 0
-    fi
-  fi 
+
+  if [ -f $N ]; then
+    if [ ! -z $N ]; then
+      if [ `$N -e "[major, minor, patch ] = process.versions.node.split('.'); console.log( !!(major>14 || major == 14 & minor >= 16) )"` = "true" ]; then
+        CELLA_NODE=$N
+        CELLA_NPM=`which npm`
+        cella_debug using node in path
+        return 0
+      fi
+    fi 
+  fi
 
   # we don't have a good node in the path
   # we would install one here if we tried 
   # before
-  CELLA_NODE=`which ${CELLA_HOME}/cache/bin/node`
+  CELLA_NODE=${CELLA_HOME}/cache/bin/node
   
-  if [ ! -z $CELLA_NODE ]; then
-    if [ `$CELLA_NODE -e "[major, minor, patch ] = process.versions.node.split('.'); console.log( major>14 || major == 14 & minor >= 12)"` -gt 0 ]; then
-       # looks good, lets grab NPM in case we need it, and get out.
-       CELLA_NPM=`which ${CELLA_HOME}/cache/bin/npm`
-       cella_debug using node from cella cache
-       return 0
-    fi
-  fi 
+  if [ -f $CELLA_NODE ]; then 
+    if [ ! -z $CELLA_NODE ]; then
+      if [ `$CELLA_NODE -e "[major, minor, patch ] = process.versions.node.split('.'); console.log( !!(major>14 || major == 14 & minor >= 12))"` = "true" ]; then
+        # looks good, lets grab NPM in case we need it, and get out.
+        CELLA_NPM=`which ${CELLA_HOME}/cache/bin/npm`
+        cella_debug using node from cella cache
+        return 0
+      fi
+    fi 
+  fi
   
   # we don't seem to have a suitable nodejs on the path
   # let's grab a well-known one, cache it and use it.
@@ -280,8 +283,12 @@ cella_bootstrap_cella() {
   $CELLA_NODE $CELLA_NPM cache clean --force >> $CELLA_HOME/log.txt 2>&1
   local OLD_PATH=$PATH
   PATH=`dirname $CELLA_NODE`:$PATH
-  $CELLA_NODE $CELLA_NPM --force install --no-save --no-lockfile --scripts-prepend-node-path=true https://aka.ms/cella.tgz?$CELLA_START_TIME  >> $CELLA_HOME/log.txt 2>&1
-  # $CELLA_NODE $CELLA_NPM --force install --no-save --no-lockfile --scripts-prepend-node-path=true /mnt/c/work/2020/scratch/cella.tgz  >> $CELLA_HOME/log.txt 2>&1
+  if [ ! -z "$USE_LOCAL_CELLA_PKG" ]; then
+    echo USING LOCAL CELLA PACKAGE $USE_LOCAL_CELLA_PKG
+    $CELLA_NODE $CELLA_NPM --force install --no-save --no-lockfile --scripts-prepend-node-path=true $USE_LOCAL_CELLA_PKG  >> $CELLA_HOME/log.txt 2>&1
+  else
+    $CELLA_NODE $CELLA_NPM --force install --no-save --no-lockfile --scripts-prepend-node-path=true https://aka.ms/cella.tgz  >> $CELLA_HOME/log.txt 2>&1
+  fi
 
   PATH=$OLD_PATH
 
@@ -347,8 +354,13 @@ cella() {
     fi
     unset CELLA_RESET
     
-    . <(curl -L aka.ms/cella.sh) "${CELLA_ARGS[@]}"
-    # . <(cat /mnt/c/work/2020/scratch/cella) "${CELLA_ARGS[@]}"
+    if [ ! -z "USE_LOCAL_CELLA_SCRIPT" ]; then
+      echo USING LOCAL CELLA SCRIPT $USE_LOCAL_CELLA_SCRIPT
+      . <(cat $USE_LOCAL_CELLA_SCRIPT) "${CELLA_ARGS[@]}"
+    else
+      . <(curl -L -# aka.ms/cella.sh) "${CELLA_ARGS[@]}"
+    fi
+
     return 0
   fi
 
@@ -408,6 +420,8 @@ cella() {
 		command rm "${CELLA_POSTSCRIPT}"
 		unset CELLA_POSTSCRIPT
 	fi
+
+  cella_cleanup
 
   CELLA_START_TIME=$cst
 }
