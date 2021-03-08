@@ -13,7 +13,7 @@ cella_init() {
 
   case $CELLA_OS in 
     ( mingw64_nt* | msys_nt* ) CELLA_OS="win" ;;
-    ( darwin*|bsd) CELLA_IS_THIS_BSD=TRUE ;;
+    ( darwin*|bsd) CELLA_IS_THIS_BSD=TRUE;;
     ( aix ) CELLA_ARCH="ppc64" ;;
   esac
 
@@ -25,9 +25,9 @@ cella_init() {
 
   # find important cmdline args
   for each in $*; do case $each  in
-    --cella-reset) CELLA_RESET=TRUE ;;
-    --cella-remove) CELLA_REMOVE=TRUE ;;
-    --debug) CELLA_DEBUG=TRUE ;;
+    --cella-reset) CELLA_RESET=TRUE;;
+    --cella-remove) CELLA_REMOVE=TRUE;;
+    --debug) CELLA_DEBUG=TRUE;;
   esac ;done
 }
 
@@ -94,7 +94,7 @@ cella_debug() {
   fi      
 }
 
-if [ "$CELLA_RESET" = "TRUE" ]; then
+if [ ! -z "$CELLA_RESET" ]; then
   if [ -d $CELLA_HOME/node_modules ]; then 
     echo Forcing reinstall of Cella package
     rm -rf $CELLA_HOME/node_modules
@@ -109,7 +109,7 @@ if [ "$CELLA_RESET" = "TRUE" ]; then
   fi
 fi
 
-if [ "$CELLA_REMOVE" = "TRUE" ]; then
+if [ ! -z "$CELLA_REMOVE" ]; then
   if [ -d $CELLA_HOME/node_modules ]; then 
     echo Removing Cella package
     rm -rf $CELLA_HOME/node_modules
@@ -132,8 +132,6 @@ if [ "$CELLA_REMOVE" = "TRUE" ]; then
   fi
   return
 fi
-
-for each in $*; do case $each in --debug) CELLA_DEBUG=TRUE ;; esac ;done
 
 cella_cleanup() {
   cella_debug unsetting variables
@@ -253,8 +251,6 @@ CELLA_SCRIPT=${CELLA_HOME}/node_modules/.bin/cella
 CELLA_MAIN=${CELLA_HOME}/node_modules/cella
 
 cella_bootstrap_cella() {
-  for each in $*; do case $each in --debug) CELLA_DEBUG=TRUE ;; esac ;done
-
   cella_debug checking for installed cella $CELLA_SCRIPT
 
   if [ -f $CELLA_SCRIPT ]; then
@@ -272,8 +268,11 @@ cella_bootstrap_cella() {
 
   cd $CELLA_HOME
   $CELLA_NODE $CELLA_NPM cache clean --force >> $CELLA_HOME/log.txt 2>&1
+  local OLD_PATH=$PATH
   PATH=`dirname $CELLA_NODE`:$PATH
   $CELLA_NODE $CELLA_NPM --force install --no-save --no-lockfile --scripts-prepend-node-path=true https://aka.ms/cella.tgz  >> $CELLA_HOME/log.txt 2>&1
+
+  PATH=$OLD_PATH
 
   cp $CELLA_HOME/node_modules/.bin/* .
   
@@ -322,7 +321,7 @@ cella() {
 
   cella_init  
 
-  if [ "$CELLA_RESET" = "TRUE" ]; then
+  if [ ! -z "$CELLA_RESET" ]; then
     if [ -d $CELLA_HOME/node_modules ]; then 
       echo Forcing reinstall of Cella package
       rm -rf $CELLA_HOME/node_modules
@@ -339,7 +338,7 @@ cella() {
     . $CELLA_HOME/cella $*
   fi
 
-  if [ "$CELLA_REMOVE" = "TRUE" ]; then
+  if [ ! -z "$CELLA_REMOVE" ]; then
     if [ -d $CELLA_HOME/node_modules ]; then 
       echo Removing Cella package
       rm -rf $CELLA_HOME/node_modules
