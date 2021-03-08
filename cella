@@ -7,7 +7,7 @@ CELLA_NODE_LATEST=14.16.0
 CELLA_NODE_REMOTE=https://nodejs.org/dist/
 CELLA_PWD=`pwd`
 
-cella_get_os() {
+cella_init() {
   CELLA_OS="$(uname | sed 'y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/')"
   CELLA_ARCH="$(uname -m | sed -e 's/x86_64/x64/;s/i86pc/x64/;s/i686/x86/;s/aarch64/arm64/')"
 
@@ -16,15 +16,22 @@ cella_get_os() {
     ( darwin*|bsd) CELLA_IS_THIS_BSD=TRUE ;;
     ( aix ) CELLA_ARCH="ppc64" ;;
   esac
+
+  if [ ! -z "$CELLA_IS_THIS_BSD" ]; then
+    CELLA_START_TIME=$(date +%s)
+  else 
+    CELLA_START_TIME=$(($(date +%s%N)/1000000))
+  fi
+
+  # find important cmdline args
+  for each in $*; do case $each  in
+    --cella-reset) CELLA_RESET=TRUE ;;
+    --cella-remove) CELLA_REMOVE=TRUE ;;
+    --debug) CELLA_DEBUG=TRUE ;;
+  esac ;done
 }
 
-cella_get_os
-
-if [ ! -z "$CELLA_IS_THIS_BSD" ]; then
-  CELLA_START_TIME=$(date +%s)
-else 
-  CELLA_START_TIME=$(($(date +%s%N)/1000000))
-fi
+cella_init
 
 # check to see if we've been dot-sourced (should work for most POSIX shells)
 sourced=0
@@ -87,7 +94,7 @@ cella_debug() {
   fi      
 }
 
-if [ "${1}" = "--reset-cella" ]; then
+if [ "$CELLA_RESET" = "TRUE" ]; then
   if [ -d $CELLA_HOME/node_modules ]; then 
     echo Forcing reinstall of Cella package
     rm -rf $CELLA_HOME/node_modules
@@ -100,11 +107,9 @@ if [ "${1}" = "--reset-cella" ]; then
   if [ -d $CELLA_HOME/cache/lib ]; then 
     rm -rf $CELLA_HOME/cache/lib
   fi
-
-  shift
 fi
 
-if [ "${1}" = "--remove-cella" ]; then
+if [ "$CELLA_REMOVE" = "TRUE" ]; then
   if [ -d $CELLA_HOME/node_modules ]; then 
     echo Removing Cella package
     rm -rf $CELLA_HOME/node_modules
@@ -125,14 +130,10 @@ if [ "${1}" = "--remove-cella" ]; then
   if [ -f $CELLA_HOME/cella ]; then 
     rm -f $CELLA_HOME/cella
   fi
-
-  shift
   return
 fi
 
-if [ "${1}" = "--debug" ]; then
-  CELLA_DEBUG=TRUE
-fi
+for each in $*; do case $each in --debug) CELLA_DEBUG=TRUE ;; esac ;done
 
 cella_cleanup() {
   cella_debug unsetting variables
@@ -149,6 +150,8 @@ cella_cleanup() {
   unset cella_bootstrap_node
   unset cella_bootstrap_cella
   unset cella_cleanup
+  unset CELLA_REMOVE
+  unset CELLA_RESET
   unset CELLA_START_TIME
   if [ -f "${CELLA_POSTSCRIPT}" ]; then
     command rm "${CELLA_POSTSCRIPT}"
@@ -158,7 +161,6 @@ cella_cleanup() {
 
 cella_bootstrap_node() {
   cella_debug starting cella_bootstrap_node
-
 
   local NODE_EXE="node"
   if [ "${CELLA_OS}" = "win" ]; then
@@ -251,6 +253,8 @@ CELLA_SCRIPT=${CELLA_HOME}/node_modules/.bin/cella
 CELLA_MAIN=${CELLA_HOME}/node_modules/cella
 
 cella_bootstrap_cella() {
+  for each in $*; do case $each in --debug) CELLA_DEBUG=TRUE ;; esac ;done
+
   cella_debug checking for installed cella $CELLA_SCRIPT
 
   if [ -f $CELLA_SCRIPT ]; then
@@ -314,7 +318,11 @@ fi
 cella_debug 'real cella adding function'
 
 cella() {
-  if [ "${1}" = "--reset-cella" ]; then
+  local cst=$CELLA_START_TIME
+
+  cella_init  
+
+  if [ "$CELLA_RESET" = "TRUE" ]; then
     if [ -d $CELLA_HOME/node_modules ]; then 
       echo Forcing reinstall of Cella package
       rm -rf $CELLA_HOME/node_modules
@@ -331,7 +339,7 @@ cella() {
     . $CELLA_HOME/cella $*
   fi
 
-  if [ "${1}" = "--remove-cella" ]; then
+  if [ "$CELLA_REMOVE" = "TRUE" ]; then
     if [ -d $CELLA_HOME/node_modules ]; then 
       echo Removing Cella package
       rm -rf $CELLA_HOME/node_modules
@@ -355,16 +363,6 @@ cella() {
 
     unset cella
     return 0
-  fi
-
-  cella_get_os
-
-  local cst=$CELLA_START_TIME
-
-  if [ ! -z "$CELLA_IS_THIS_BSD" ]; then
-    CELLA_START_TIME=$(date +%s)
-  else 
-    CELLA_START_TIME=$(($(date +%s%N)/1000000))
   fi
 
   if [ ! -f $CELLA_NODE ]; then
