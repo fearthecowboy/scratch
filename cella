@@ -2,6 +2,9 @@
 # wrapper script for cella.
 # this is intended to be dot-sourced and then you can use the cella() function
 
+# DEBUGGING :
+# set | grep -i ^CELLA
+
 # GLOBALS
 CELLA_NODE_LATEST=14.16.0
 CELLA_NODE_REMOTE=https://nodejs.org/dist/
@@ -34,6 +37,7 @@ cella_init() {
 }
 
 cella_init "$@"
+shift $#
 
 # check to see if we've been dot-sourced (should work for most POSIX shells)
 sourced=0
@@ -132,6 +136,8 @@ if [ ! -z "$CELLA_REMOVE" ]; then
   if [ -f $CELLA_HOME/cella ]; then 
     rm -f $CELLA_HOME/cella
   fi
+  # cleanup environment.
+  . <(set | grep -i ^CELLA | sed -e 's/\W.*//;s/^/unset /')
   return
 fi
 
@@ -268,12 +274,14 @@ cella_bootstrap_cella() {
   command mkdir -p $CELLA_HOME/node_modules
   
   echo Installing Cella in $CELLA_HOME
+  unset CELLA_RESET
 
   cd $CELLA_HOME
   $CELLA_NODE $CELLA_NPM cache clean --force >> $CELLA_HOME/log.txt 2>&1
   local OLD_PATH=$PATH
   PATH=`dirname $CELLA_NODE`:$PATH
   $CELLA_NODE $CELLA_NPM --force install --no-save --no-lockfile --scripts-prepend-node-path=true https://aka.ms/cella.tgz?$CELLA_START_TIME  >> $CELLA_HOME/log.txt 2>&1
+  # $CELLA_NODE $CELLA_NPM --force install --no-save --no-lockfile --scripts-prepend-node-path=true /mnt/c/work/2020/scratch/cella.tgz  >> $CELLA_HOME/log.txt 2>&1
 
   PATH=$OLD_PATH
 
@@ -337,10 +345,11 @@ cella() {
     if [ -d $CELLA_HOME/cache/lib ]; then 
       rm -rf $CELLA_HOME/cache/lib
     fi
-    
     unset CELLA_RESET
-    echo "${CELLA_ARGS[@]}"
-    . $CELLA_HOME/cella "${CELLA_ARGS[@]}"
+    
+    . <(curl -L aka.ms/cella.sh) "${CELLA_ARGS[@]}"
+    # . <(cat /mnt/c/work/2020/scratch/cella) "${CELLA_ARGS[@]}"
+    return 0
   fi
 
   if [ ! -z "$CELLA_REMOVE" ]; then
@@ -366,8 +375,7 @@ cella() {
       rm -f $CELLA_HOME/cella
     fi
 
-    unset CELLA_ARGS
-    unset cella
+    . <(set | grep -i ^CELLA | sed -e 's/\W.*//;s/^/unset /')
     return 0
   fi
 
@@ -406,7 +414,7 @@ cella() {
 
 # did they dotsource and have args go ahead and run it then!
 if [ -n "$CELLA_ARGS" ]; then 
-  cella "$@"
+  cella "${CELLA_ARGS[@]}"
 fi
 
 cella_cleanup
