@@ -145,7 +145,6 @@ if [ ! -z "$CELLA_REMOVE" ]; then
 fi
 
 cella_cleanup() {
-  cella_debug unsetting variables
   # clear things that we're not going to need for the long term
   unset CELLA_NODE_LATEST
   unset CELLA_NODE_REMOTE
