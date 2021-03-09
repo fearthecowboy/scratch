@@ -156,8 +156,8 @@ cella_cleanup() {
   unset CELLA_ARCH
   unset CELLA_IS_THIS_BSD
   unset CELLA_DEBUG
-  unset -f cella_bootstrap_node
-  unset -f cella_bootstrap_cella
+  unset -f cella_bootstrap_node > /dev/null 2>&1
+  unset -f cella_bootstrap_cella > /dev/null 2>&1
   unset CELLA_REMOVE
   unset CELLA_RESET
   unset CELLA_START_TIME
@@ -338,7 +338,7 @@ fi
 cella_debug 'real cella adding function'
 
 cella() {
-  set | grep -i ^CELLA
+  # set | grep -i ^CELLA
 
   local cst=$CELLA_START_TIME
 
