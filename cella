@@ -137,10 +137,10 @@ if [ ! -z "$CELLA_REMOVE" ]; then
     rm -f $CELLA_HOME/cella
   fi
   # cleanup environment.
-  . <(set | grep -i ^CELLA | sed -e 's/\W.*//;s/^/unset /')
+  . <(set | grep -i ^CELLA | sed -e 's/[=| |\W].*//;s/^/unset /')
   
   # remove functions (zsh)
-  which functions  > /dev/null 2>&1  && . <(functions | grep -i ^cella | sed -e 's/\W.*//;s/^/unset -f /';)
+  which functions  > /dev/null 2>&1  && . <(functions | grep -i ^cella | sed -e 's/[=| |\W].*//;s/^/unset -f /';)
   return
 fi
 
