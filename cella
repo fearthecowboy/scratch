@@ -365,7 +365,7 @@ cella() {
     fi
     unset CELLA_RESET
     
-    if [ ! -z "USE_LOCAL_CELLA_SCRIPT" ]; then
+    if [ ! -z "$USE_LOCAL_CELLA_SCRIPT" ]; then
       echo USING LOCAL CELLA SCRIPT $USE_LOCAL_CELLA_SCRIPT
       . <(cat $USE_LOCAL_CELLA_SCRIPT) "${CELLA_ARGS[@]}"
     else
