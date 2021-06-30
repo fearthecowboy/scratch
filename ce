@@ -305,7 +305,7 @@ ce_bootstrap_ce() {
     echo USING LOCAL CE PACKAGE $USE_LOCAL_CE_PKG
     $CE_NODE $CE_NPM --force install --no-save --no-lockfile --scripts-prepend-node-path=true $USE_LOCAL_CE_PKG  >> $CE_HOME/log.txt 2>&1
   else
-    $CE_NODE $CE_NPM --force install --no-save --no-lockfile --scripts-prepend-node-path=true https://aka.ms/ce.tgz  >> $CE_HOME/log.txt 2>&1
+    $CE_NODE $CE_NPM --force install --no-save --no-lockfile --scripts-prepend-node-path=true https://aka.ms/vcpkg-ce.tgz  >> $CE_HOME/log.txt 2>&1
   fi
 
   PATH=$OLD_PATH
