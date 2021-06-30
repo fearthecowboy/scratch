@@ -273,7 +273,7 @@ $shh = New-Module -name vcpkg-ce -ArgumentList @($CE_NODE,$CE_MODULE,$CE_HOME) -
     if( -not (test-path $CE_MODULE )) {
       write-error "vcpkg-ce is not installed."
       write-host -nonewline "You can reinstall vcpkg-ce by running "
-      write-host -fore green "iex (iwr -useb aka.ms/ce.ps1)"
+      write-host -fore green "iex (iwr -useb aka.ms/install-ce.ps1)"
       return
     }
 

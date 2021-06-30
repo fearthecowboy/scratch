@@ -381,7 +381,7 @@ ce() {
       echo USING LOCAL CE SCRIPT $USE_LOCAL_CE_SCRIPT
       . <(cat $USE_LOCAL_CE_SCRIPT) "${CE_ARGS[@]}"
     else
-      . <(curl -L -# aka.ms/ce.sh) "${CE_ARGS[@]}"
+      . <(curl -L -# aka.ms/install-ce.sh) "${CE_ARGS[@]}"
     fi
 
     return 0
@@ -424,13 +424,13 @@ ce() {
 
   if [ ! -f $CE_NODE ]; then
     echo The installation of nodejs $CE_NODE that ce is using is missing
-    echo You may need to reacquire ce with '. <(curl aka.ms/ce.sh -L)'
+    echo You may need to reacquire ce with '. <(curl aka.ms/install-ce.sh -L)'
     echo or fix your nodejs installation.
   fi
 
   if [ ! -d $CE_MAIN ]; then
     echo The installation of ce is corrupted. $CE_MAIN
-    echo You may need to reacquire ce with '. <(curl aka.ms/ce.sh -L)'
+    echo You may need to reacquire ce with '. <(curl aka.ms/install-ce.sh -L)'
   fi
 
   # set the response file
