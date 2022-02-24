@@ -317,7 +317,7 @@ VCPKG_bootstrap_ce() {
 
     $VCPKG_NODE $VCPKG_NPM --force install --no-save --no-lockfile --scripts-prepend-node-path=true $USE_LOCAL_VCPKG_PKG  >> $VCPKG_ROOT/log.txt 2>&1
   else
-    $VCPKG_NODE $VCPKG_NPM --force install --no-save --no-lockfile --scripts-prepend-node-path=true https://github.com/fearthecowboy/scratch/raw/main/ce.tgz  >> $VCPKG_ROOT/log.txt 2>&1
+    $VCPKG_NODE $VCPKG_NPM --force install --no-save --no-lockfile --scripts-prepend-node-path=true https://github.com/fearthecowboy/scratch/raw/main/vcpkg-ce.tgz  >> $VCPKG_ROOT/log.txt 2>&1
   fi
 
   PATH=$OLD_PATH

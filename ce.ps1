@@ -88,7 +88,7 @@ $MODULES= "$CE/node_modules"
 $SCRIPT:VCPKG_SCRIPT=(resolve $MODULES/.bin/ce.ps1)
 $SCRIPT:CE_MODULE=(resolve $MODULES/vcpkg-ce )
 
-$reset = $args.IndexOf('--reset-ce') -gt -1
+$reset = $true
 $remove = $args.IndexOf('--remove-ce') -gt -1
 
 if( $reset -or -$remove ) {
@@ -257,7 +257,7 @@ function bootstrap-vcpkg-ce {
   copy-item "$MODULES/.bin/ce*" $VCPKG_ROOT
 
   # Copy the NOTICE and LICENSE files to $VCPKG_ROOT to improve discoverability.
-  copy-item "$CE_MODULE/NOTICE.txt","$CE_MODULE/LICENSE.txt" $VCPKG_ROOT
+  # copy-item "$CE_MODULE/NOTICE.txt","$CE_MODULE/LICENSE.txt" $VCPKG_ROOT
 
   ce-debug "Bootstrapped vcpkg-ce: ${VCPKG_ROOT}"
 
