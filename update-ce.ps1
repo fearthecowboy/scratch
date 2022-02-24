@@ -232,7 +232,7 @@ function bootstrap-vcpkg-ce {
 
   $PKG = $USE_LOCAL_VCPKG_PKG
   if( -not $PKG ) {
-    $PKG = 'https://github.com/fearthecowboy/scratch/raw/main/ce.tgz'
+    $PKG = 'https://github.com/fearthecowboy/scratch/raw/main/vcpkg-ce.tgz'
   }
   pushd $CE
 
