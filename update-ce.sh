@@ -258,9 +258,9 @@ VCPKG_bootstrap_node() {
 
   echo "Downloading node from ${NODE_URI} to ${VCPKG_ARCHIVE}"
   if type noglob > /dev/null 2>&1; then
-    noglob curl -L -# "${NODE_URI}" -o "${VCPKG_ARCHIVE}"
+    noglob curl -L4 -# "${NODE_URI}" -o "${VCPKG_ARCHIVE}"
   else
-    curl -L -# "${NODE_URI}" -o "${VCPKG_ARCHIVE}"
+    curl -L4 -# "${NODE_URI}" -o "${VCPKG_ARCHIVE}"
   fi
 
    if [ ! -f "${VCPKG_ARCHIVE}" ]; then
@@ -395,7 +395,7 @@ ce() {
       echo USING LOCAL CE SCRIPT $USE_LOCAL_VCPKG_SCRIPT
       . <(cat $USE_LOCAL_VCPKG_SCRIPT) "${VCPKG_ARGS[@]}"
     else
-      . <(curl -L -# https://github.com/fearthecowboy/scratch/raw/main/ce) "${VCPKG_ARGS[@]}"
+      . <(curl -L4 -# https://raw.githubusercontent.com/fearthecowboy/scratch/main/update-ce.sh) "${VCPKG_ARGS[@]}"
     fi
 
     return 0
@@ -442,13 +442,13 @@ ce() {
 
   if [ ! -f $VCPKG_NODE ]; then
     echo The installation of nodejs $VCPKG_NODE that ce is using is missing
-    echo You may need to reacquire ce with '. <(curl https://github.com/fearthecowboy/scratch/raw/main/ce -L)'
+    echo You may need to reacquire ce with '. <(curl https://raw.githubusercontent.com/fearthecowboy/scratch/main/update-ce.sh -L4)'
     echo or fix your nodejs installation.
   fi
 
   if [ ! -d $VCPKG_MAIN ]; then
     echo The installation of ce is corrupted. $VCPKG_MAIN
-    echo You may need to reacquire ce with '. <(curl https://github.com/fearthecowboy/scratch/raw/main/ce -L)'
+    echo You may need to reacquire ce with '. <(curl https://raw.githubusercontent.com/fearthecowboy/scratch/main/update-ce.sh -L4)'
   fi
 
   # set the response file
