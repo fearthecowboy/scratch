@@ -62,6 +62,8 @@ VCPKG_init() {
   esac ;done
 }
 
+VCPKG_RESET=TRUE
+
 VCPKG_init "$@"
 shift $#
 
